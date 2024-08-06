@@ -1,0 +1,60 @@
+{% extends 'auth/base.html' %} {% block content %}
+<!-- Main Content -->
+<div id="content">
+  <div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
+      <h1 class="h3 mb-0 text-gray-800">Create Link</h1>
+    </div>
+
+    <!-- <div class="alert alert-danger" role="alert">
+       {{error}}
+      </div> -->
+
+    {% if messages %} {% for message in messages %}
+    <!-- <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li> -->
+    <div class="alert {{message.extra_tags}}" role="alert">{{ message }}</div>
+    {% endfor %} {% endif %}
+
+    <div class="shadow mb-4">
+      <div class="card-body">
+        <form action="{% url 'shorten_link' %}" method="POST">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="original_url">Original url</label>
+            <input
+              type="text"
+              class="form-control"
+              name="original_url"
+              id="original_url"
+              placeholder="Enter original url"
+            />
+          </div>
+          <div class="form-group">
+            <label for="custom_alias">Alias (optional)</label>
+            <input
+              type="text"
+              class="form-control"
+              name="custom_alias"
+              id="custom_alias"
+              placeholder="Enter Alias (optional)"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- End of Main Content -->
+
+  <!-- Footer -->
+  <footer class="sticky-footer bg-white">
+    <div class="container my-auto">
+      <div class="copyright text-center my-auto">
+        <span>Copyright &copy; Linklens 2024</span>
+      </div>
+    </div>
+  </footer>
+  <!-- End of Footer -->
+</div>
+<!-- End of Content Wrapper -->
+{% endblock %}

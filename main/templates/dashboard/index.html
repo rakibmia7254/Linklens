@@ -1,0 +1,139 @@
+{% extends "auth/base.html" %} {% block content %}
+<!-- Main Content -->
+<div id="content">
+  <!-- Topbar -->
+
+  <!-- End of Topbar -->
+
+  <!-- Begin Page Content -->
+  <div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
+      <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+      <a
+        href="{% url 'shorten_link' %}"
+        class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+        ><i class="fas fa-plus fa-sm text-white-50"></i> Create Link</a
+      >
+    </div>
+
+    {% if messages %} {% for message in messages %}
+    <!-- <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li> -->
+    <div class="alert {{message.extra_tags}}" role="alert">{{ message }}</div>
+    {% endfor %} {% endif %}
+
+    <!-- Content Row -->
+    <div class="row">
+      <!-- Clicks -->
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div
+                  class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                >
+                  Clicks (today)
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  {{clicks_today}}
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-hand-pointer fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div
+                  class="text-xs font-weight-bold text-info text-uppercase mb-1"
+                >
+                  Your Links
+                </div>
+                <div class="row no-gutters align-items-center">
+                  <div class="col-auto">
+                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">
+                      {{user_links_count}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-link fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if user_links %}
+  <div class="card shadow m-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Your Links</h6>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table
+          class="table table-bordered"
+          id="dataTable"
+          width="100%"
+          cellspacing="0"
+        >
+          <thead>
+            <tr>
+              <th>Alias</th>
+              <th>Short Url</th>
+              <th>Created At</th>
+              <th>Analytics</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for url in user_links %}
+            <tr>
+              <td>{{url.custom_alias}}</td>
+              <td>{{url.short_url}}</td>
+              <td>{{url.created_at}}</td>
+              <td><a href="/analysis/{{url.custom_alias}}">Details</a></td>
+              <td>
+                <a
+                  href="{% url 'delete_link' custom_alias=url.custom_alias %}"
+                  type="button"
+                  class="btn btn-danger"
+                  >Delete</a
+                >
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="card shadow m-4 p-5">
+    <h6 class="m-0 font-weight-bold text-primary">You have no links yet</h6>
+  </div>
+  {% endif %}
+</div>
+<!-- End of Main Content -->
+
+<!-- Footer -->
+<footer class="sticky-footer bg-white">
+  <div class="container my-auto">
+    <div class="copyright text-center my-auto">
+      <span>Copyright &copy; Linklens 2024</span>
+    </div>
+  </div>
+</footer>
+<!-- End of Footer -->
+
+{% endblock %}

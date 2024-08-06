@@ -1,0 +1,248 @@
+{% extends "auth/base.html" %} {% block content %} {% load static %}
+<!-- Main Content -->
+<div id="content">
+  <!-- Topbar -->
+
+  <!-- End of Topbar -->
+
+  <!-- Begin Page Content -->
+  <div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
+      <h1 class="h3 mb-0 text-gray-800">Analytics</h1>
+      <div>
+        {% if not all_data %}
+        <a
+          href="{% url 'generate_qr_code' alias=link %}"
+          class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+          download="{{link}}.png"
+          ><i class="fas fa-download fa-sm text-white-50"></i> Download QR</a
+        >
+        {% endif %}
+        <a
+          href="{% url 'shorten_link' %}"
+          class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+          ><i class="fas fa-plus fa-sm text-white-50"></i> Create Link</a
+        >
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div
+                  class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                >
+                  Total Clicks
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  {{clicks}}
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-hand-pointer fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% if not all_data %}
+      <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+          <div class="card-body">
+            <div class="row no-gutters align-items-center">
+              <div class="col mr-2">
+                <div
+                  class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+                >
+                  Alias
+                </div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                  {{link}}
+                </div>
+              </div>
+              <div class="col-auto">
+                <i class="fas fa-link fa-2x text-gray-300"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <!-- Area Chart -->
+    <div>
+      <div class="card shadow mb-4">
+        <!-- Card Header - Dropdown -->
+        <div
+          class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
+        >
+          <h6 class="m-0 font-weight-bold text-primary">Clicks</h6>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body">
+          <div>
+            <canvas id="lineChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <div>
+      <div class="card shadow mb-4">
+        <!-- Card Header - Dropdown -->
+        <div
+          class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
+        >
+          <h6 class="m-0 font-weight-bold text-primary">Top Browsers</h6>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body">
+          <div
+            class="container-fluid d-flex align-items-center justify-content-center"
+          >
+            <div id="piechart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <div>
+      <div class="card shadow mb-4">
+        <!-- Card Header - Dropdown -->
+        <div
+          class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
+        >
+          <h6 class="m-0 font-weight-bold text-primary">Top Devices</h6>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body">
+          <div
+            class="container-fluid d-flex align-items-center justify-content-center"
+          >
+            <div id="piechart-devices"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <div>
+      <div class="card shadow mb-4">
+        <!-- Card Header - Dropdown -->
+        <div
+          class="card-header py-3 d-flex flex-row align-items-center justify-content-between"
+        >
+          <h6 class="m-0 font-weight-bold text-primary">Top Countries</h6>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body">
+          <div
+            class="container-fluid d-flex align-items-center justify-content-center"
+          >
+            <div id="piechart-countries"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End of Main Content -->
+<script
+  type="text/javascript"
+  src="https://www.gstatic.com/charts/loader.js"
+></script>
+<script src="{% static 'Chart.js' %}"></script>
+<script>
+  // Your data
+  var chartData = {{ click_data|safe  }};
+
+  // Extract dates and counts from chartData
+  var dates = chartData.map((entry) => entry.date);
+  var counts = chartData.map((entry) => entry.count);
+
+  // Get canvas element
+  var ctx = document.getElementById("lineChart").getContext("2d");
+
+  // Create chart
+  var myChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: dates,
+      datasets: [
+        {
+          label: "Clicks",
+          data: counts,
+          borderColor: "rgb(75, 192, 192)",
+          tension: 0.1,
+        },
+      ],
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
+      },
+    },
+  });
+
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawChart);
+
+  // Draw the chart and set the chart values
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+      ["Browser", "Percentage"],
+      {% for value in browsers %}
+      ['{{ value.0 | safe }}', {{ value.1 | safe }}],
+      {% endfor %}
+    ]);
+
+    var devicedata = google.visualization.arrayToDataTable([
+      ["Device", "Percentage"],
+      {% for value in devices %}
+      ['{{ value.0 | safe }}', {{ value.1 | safe }}],
+      {% endfor %}
+    ]);
+
+    var countrydata = google.visualization.arrayToDataTable([
+      ["Country", "Percentage"],
+      {% for value in countrys %}
+      ['{{ value.0 | safe }}', {{ value.1 | safe }}],
+      {% endfor %}
+    ]);
+
+    new google.visualization.PieChart(
+      document.getElementById("piechart")
+    ).draw(data, { title: "Browser", width: 550, height: 400 });
+
+    new google.visualization.PieChart(
+      document.getElementById("piechart-devices")
+    ).draw(devicedata, { title: "Device", width: 550, height: 400 });
+
+    new google.visualization.PieChart(
+      document.getElementById("piechart-countries")
+    ).draw(countrydata, { title: "Country", width: 550, height: 400 });
+  }
+</script>
+<!-- Footer -->
+<footer class="sticky-footer bg-white">
+  <div class="container my-auto">
+    <div class="copyright text-center my-auto">
+      <span>Copyright &copy; Linklens 2024</span>
+    </div>
+  </div>
+</footer>
+<!-- End of Footer -->
+{% endblock %}
