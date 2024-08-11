@@ -54,7 +54,7 @@ def shorten_link(request):
             messages.error(request, "Original URL is required", "alert-danger")
             return redirect("shorten_link")
 
-        full_link = f"https://linklens.onrender.com//redirect/{custom_alias}"
+        full_link = f"https://linklens.onrender.com/redirect/{custom_alias}"
 
         try:
             response_gd = requests.get(
